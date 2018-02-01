@@ -4,11 +4,11 @@
 (set-env! :resource-paths #{"resources" "src" "test/resources"}
           :source-paths   #{"test/src"}
           :dependencies   '[[adzerk/boot-test "RELEASE" :scope "test"]
-                            [com.grzm/tespresso.alpha "0.1.0"]
+                            [com.grzm/tespresso.alpha "0.1.3"]
                             [metosin/boot-alt-test "0.3.2" :scope "test"]
                             [org.clojure/clojure "RELEASE"]
                             [org.clojure/spec.alpha "0.1.123" :scope "test"]
-                            [org.clojure/test.check "0.9.1-SNAPSHOT" :scope "test"]
+                            [org.clojure/test.check "0.10.0-alpha2" :scope "test"]
                             [org.clojure/tools.logging "0.4.0"]])
 
 (task-options!

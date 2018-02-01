@@ -9,7 +9,7 @@
    [clojure.test.check.properties :as prop]
    [com.grzm.pique.alpha.env.environment :as env]
    [com.grzm.pique.alpha.env.service :as service]
-   [com.grzm.tespresso.alpha.clojure-tools-logging :refer [with-logging]])
+   [com.grzm.tespresso.tools-logging.alpha :refer [with-logging]])
   (:import
    (java.io BufferedReader StringReader)))
 
@@ -101,21 +101,21 @@
                                  :system-env     {"PGUSER"     "failing-user"
                                                   "PGDATABASE" "some-dbname"}})]
           (env/password env)
-          (is (= ["com.grzm.pique.alpha.env.environment" :trace nil
-                  "No matching entry found: {:dbname \"some-dbname\", :user \"failing-user\"}"]
+          (is (= [["com.grzm.pique.alpha.env.environment" :trace nil
+                   "No matching entry found: {:dbname \"some-dbname\", :user \"failing-user\"}"]]
                  @log-entry)))))
 
     (testing "don't look up password if dbname and user aren't provided:"
       (with-logging [#{:trace} log-entry]
         (testing "missing both PGDATABASE and PGUSER"
           (is (nil? (env/password (map->TestEnv env-map))))
-          (is (nil? @log-entry)))
+          (is (empty? @log-entry)))
         (testing "have only PGUSER"
           (is (nil? (env/password (map->TestEnv (assoc env-map :system-env {"PGUSER" "some-user"})))))
-          (is (nil? @log-entry)))
+          (is (empty? @log-entry)))
         (testing "have only PGDATABASE"
           (is (nil? (env/password (map->TestEnv (assoc env-map :system-env {"PGDATABASE" "some-dbname"})))))
-          (is (nil? @log-entry)))))))
+          (is (empty? @log-entry)))))))
 
 (deftest test-services
   (let [service       "foo"

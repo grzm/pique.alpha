@@ -61,7 +61,7 @@
 (deftest bad-line-throws
   (let [bad-line "this-is-a-badline"]
     (is (com.grzm.tespresso/thrown-with-data?
-          #"invalid" (tespresso/ex-data-keys= {:line  bad-line
+          #"invalid" (tespresso/ex-data= {:line  bad-line
                                           :cause ::password/invalid-line})
           (password/parse-line bad-line)))))
 
@@ -212,9 +212,9 @@
                     :password "some-password"}]]
     (is (com.grzm.tespresso/thrown-with-data?
           #"no matching entry"
-          (tespresso/ex-data-keys= {:cause ::password/no-matching-entry})
+          (tespresso/ex-data= {:cause ::password/no-matching-entry})
           (password/password conn-info entries)))
     (is (com.grzm.tespresso/thrown-with-data?
           #"no matching entry"
-          (tespresso/ex-data-keys= {:cause ::password/no-matching-entry})
+          (tespresso/ex-data= {:cause ::password/no-matching-entry})
           (password/password conn-info [])))))

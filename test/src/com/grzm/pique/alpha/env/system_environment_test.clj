@@ -8,7 +8,7 @@
    [clojure.test.check.properties :as prop]
    [com.grzm.pique.alpha.env.system-environment :as sys-env]
    [com.grzm.tespresso.alpha :as tespresso]
-   [com.grzm.tespresso.alpha.clojure-tools-logging :refer [with-logging]])
+   [com.grzm.tespresso.tools-logging.alpha :refer [with-logging]])
   (:import
    (java.io File)
    (java.nio.file Files Paths)
@@ -113,7 +113,7 @@
   (let [file (io/file "no-such-file.conf")]
     (with-logging [#{:trace} log-entry]
       (is (com.grzm.tespresso/thrown-with-data?
-            #"service file not found" (tespresso/ex-data-keys= {:cause ::sys-env/service-file-not-found})
+            #"service file not found" (tespresso/ex-data= {:cause ::sys-env/service-file-not-found})
             (sys-env/read-service-file* "my-service" file)))
       (is (nil? @log-entry)))))
 
