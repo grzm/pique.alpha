@@ -11,7 +11,7 @@
    (clojure.lang ExceptionInfo)
    (java.io FileNotFoundException)
    (java.lang IllegalArgumentException)
-   (java.nio.file Files Paths LinkOption FileSystems)
+   (java.nio.file Files Paths LinkOption FileSystems NoSuchFileException)
    (java.nio.file.attribute PosixFilePermissions PosixFilePermission)))
 
 (defprotocol Env
@@ -135,11 +135,14 @@
 
 (defn read-password-file
   [file]
-  (if (valid-permissions? file)
-    (get-file file)
-    (log/warnf (str "password file \"%s\" has group or world access; "
-                    "permissions should be u=rw (0600) or less")
-               (str file))))
+  (try
+    (if (valid-permissions? file)
+      (get-file file)
+      (log/warnf (str "password file \"%s\" has group or world access; "
+                      "permissions should be u=rw (0600) or less")
+                 (str file)))
+    (catch NoSuchFileException _
+      (log/tracef "password file \"%s\" not found" (str file)))))
 
 (defrecord SystemEnvironment [user-dir sysconfdir env]
   environment/EnvironmentReader

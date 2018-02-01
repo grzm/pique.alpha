@@ -74,6 +74,15 @@
                           (= :warn level)
                           (re-find #"password file .+ has group or world access" msg))))))))
 
+(deftest ^:io read-password-file-returns-nil-when-file-not-found
+  (let [file (io/file "no/such/.pgpass")]
+    (with-logging [#{:trace} log-entries]
+      (is (nil? (sys-env/read-password-file file)))
+      (is (= [["com.grzm.pique.alpha.env.system-environment"
+               :trace nil
+               "password file \"no/such/.pgpass\" not found"]]
+             @log-entries)))))
+
 (deftest user-filenames
   (let [user-dir (sys-env/->UserHome "/some/home")]
     (is (= "/some/home/.pgpass" (str (sys-env/password-file user-dir))))
