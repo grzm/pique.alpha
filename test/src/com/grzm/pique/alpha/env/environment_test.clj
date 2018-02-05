@@ -96,26 +96,26 @@
         (is (= user-pgpass-password (env/password env)))))
 
     (testing "warn if no password is found in password file"
-      (with-logging [#{:trace} log-entry]
+      (with-logging [#{:trace} log-entries]
         (let [env (map->TestEnv {:user-passwords "some-host:some-dbname:some-port:some-user:some-pass"
                                  :system-env     {"PGUSER"     "failing-user"
                                                   "PGDATABASE" "some-dbname"}})]
           (env/password env)
           (is (= [["com.grzm.pique.alpha.env.environment" :trace nil
                    "No matching entry found: {:dbname \"some-dbname\", :user \"failing-user\"}"]]
-                 @log-entry)))))
+                 @log-entries)))))
 
     (testing "don't look up password if dbname and user aren't provided:"
-      (with-logging [#{:trace} log-entry]
+      (with-logging [#{:trace} log-entries]
         (testing "missing both PGDATABASE and PGUSER"
           (is (nil? (env/password (map->TestEnv env-map))))
-          (is (empty? @log-entry)))
+          (is (empty? @log-entries)))
         (testing "have only PGUSER"
           (is (nil? (env/password (map->TestEnv (assoc env-map :system-env {"PGUSER" "some-user"})))))
-          (is (empty? @log-entry)))
+          (is (empty? @log-entries)))
         (testing "have only PGDATABASE"
           (is (nil? (env/password (map->TestEnv (assoc env-map :system-env {"PGDATABASE" "some-dbname"})))))
-          (is (empty? @log-entry)))))))
+          (is (empty? @log-entries)))))))
 
 (deftest test-services
   (let [service       "foo"

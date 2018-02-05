@@ -205,16 +205,16 @@
                    :dbname "some-dbname"
                    :user   "some-user"}
         password  "my-password"
-        entries   [{:host     "other-host"
-                    :port     5422
-                    :dbname   "other-dbname"
-                    :user     "other-user"
-                    :password "some-password"}]]
+        entries   [[{:host     "other-host"
+                      :port     5422
+                      :dbname   "other-dbname"
+                      :user     "other-user"
+                      :password "some-password"}]]]
     (is (com.grzm.tespresso/thrown-with-data?
           #"no matching entry"
-          (tespresso/ex-data= {:cause ::password/no-matching-entry})
+          (tespresso/ex-data-select= {:cause ::password/no-matching-entry})
           (password/password conn-info entries)))
     (is (com.grzm.tespresso/thrown-with-data?
           #"no matching entry"
-          (tespresso/ex-data= {:cause ::password/no-matching-entry})
+          (tespresso/ex-data-select= {:cause ::password/no-matching-entry})
           (password/password conn-info [])))))

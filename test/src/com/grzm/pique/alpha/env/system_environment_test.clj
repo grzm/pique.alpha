@@ -66,13 +66,22 @@
   (let [contents "some-host:6543:some-dbname:some-user:some-password"]
     (prop/for-all [perms invalid-perms-gen]
                   (let [password-file (create-temp-password-file contents perms)]
-                    (with-logging [#{:warn} log-entry]
+                    (with-logging [#{:warn} log-entries]
                       (sys-env/read-password-file password-file)
-                      (let [[ns level _ msg] @log-entry]
+                      (let [[ns level _ msg] (first @log-entries)]
                         (and
                           (= ns "com.grzm.pique.alpha.env.system-environment")
                           (= :warn level)
                           (re-find #"password file .+ has group or world access" msg))))))))
+
+(deftest ^:io read-password-file-returns-nil-when-file-not-found
+  (let [file (io/file "no/such/.pgpass")]
+    (with-logging [#{:trace} log-entries]
+      (is (nil? (sys-env/read-password-file file)))
+      (is (= [["com.grzm.pique.alpha.env.system-environment"
+               :trace nil
+               "password file \"no/such/.pgpass\" not found"]]
+             @log-entries)))))
 
 (deftest user-filenames
   (let [user-dir (sys-env/->UserHome "/some/home")]
@@ -111,11 +120,11 @@
 
 (deftest ^:io read-service-file*-throws-when-file-not-found
   (let [file (io/file "no-such-file.conf")]
-    (with-logging [#{:trace} log-entry]
+    (with-logging [#{:trace} log-entries]
       (is (com.grzm.tespresso/thrown-with-data?
-            #"service file not found" (tespresso/ex-data= {:cause ::sys-env/service-file-not-found})
+            #"service file not found" (tespresso/ex-data-select= {:cause ::sys-env/service-file-not-found})
             (sys-env/read-service-file* "my-service" file)))
-      (is (nil? @log-entry)))))
+      (is (empty? @log-entries)))))
 
 (deftest ^:io read-service-file-without-no-such-service
   (let [sys-env (sys-env/map->SystemEnvironment
@@ -123,11 +132,11 @@
                    :sysconfdir (->TestSysConfDir "/etc/pg/sysconfdir")
                    :env        (->TestEnv {"PGSERVICE" "no-such-service"})})]
     (testing "no such service in found service file"
-      (with-logging [#{:warn} log-entry]
+      (with-logging [#{:warn} log-entries]
         (let [file-fn (constantly (io/resource "test-pg_service.conf"))]
           (is (nil? (sys-env/read-service-file sys-env file-fn)))
-          (is (= ["com.grzm.pique.alpha.env.system-environment" :warn nil
-                  "definition of service \"no-such-service\" not found"] @log-entry)))))))
+          (is (= [["com.grzm.pique.alpha.env.system-environment" :warn nil
+                    "definition of service \"no-such-service\" not found"]] @log-entries)))))))
 
 (deftest ^:io read-service-file
   (let [sys-env (sys-env/map->SystemEnvironment
@@ -135,19 +144,19 @@
                    :sysconfdir (->TestSysConfDir "/etc/pg/sysconfdir")
                    :env        (->TestEnv {"PGSERVICE" "pique"})})]
     (testing "finding service in service file"
-      (with-logging [#{:warn} log-entry]
+      (with-logging [#{:warn} log-entries]
         (let [file-fn (constantly (io/resource "test-pg_service.conf"))]
           (is (= {:dbname "pique-dbname", :port "9876", :user "pique-user"}
                  (sys-env/read-service-file sys-env file-fn)))
-          (is (nil? @log-entry) "no log entry when successful"))))
+          (is (empty? @log-entries) "no log entry when successful"))))
     (testing "no service file"
       (let [file-fn (constantly (io/file "no-such-test-pg_service.conf"))]
-        (with-logging [#{:trace} log-entry]
+        (with-logging [#{:trace} log-entries]
           (is (nil? (sys-env/read-service-file sys-env file-fn)))
-          (is (= ["com.grzm.pique.alpha.env.system-environment"
-                  :trace nil
-                  "service file \"no-such-test-pg_service.conf\" not found"]
-                 @log-entry)))))))
+          (is (= [["com.grzm.pique.alpha.env.system-environment"
+                    :trace nil
+                    "service file \"no-such-test-pg_service.conf\" not found"]]
+                 @log-entries)))))))
 
 (deftest system-environment-constructor
   (let [sys-env (sys-env/system-environment)]
