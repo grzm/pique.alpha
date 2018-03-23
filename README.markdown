@@ -5,6 +5,37 @@ PostgreSQL parameters in the same manner as libpq.
 
 **NOTE: This is alpha. The little API it has is not stable.**
 
+## Releases and Dependency Information
+
+Releases are on [Clojars](https://clojars.org/com.grzm/pique.alpha).
+
+### Clojure [CLI/deps.edn][deps] coordinates:
+
+```clojure
+{com.grzm/pique.alpha {:mvn/version "0.1.6"}}
+```
+
+### [Leiningen][]/[Boot][] dependency information:
+
+```clojure
+[com.grzm/pique.alpha "0.1.6"]
+```
+
+### [Maven] dependency information:
+
+```xml
+<dependency>
+  <groupId>com.grzm</groupId>
+  <artifactId>pique.alpha</artifactId>
+  <version>0.1.6</version>
+</dependency>
+```
+
+[deps]: https://clojure.org/reference/deps_and_cli
+[Leiningen]: http://leiningen.org/
+[Boot]: http://boot-clj.com
+[Maven]: http://maven.apache.org/
+
 ## Usage
 
 Easily use your PostgreSQL environment variables, service files, and `.pgpass`
