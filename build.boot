@@ -1,5 +1,5 @@
 (def project 'com.grzm/pique.alpha)
-(def version "0.1.1-SNAPSHOT")
+(def version "0.1.6")
 
 (set-env! :resource-paths #{"resources" "src" "test/resources"}
           :source-paths   #{"test/src"}
